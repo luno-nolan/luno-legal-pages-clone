@@ -1,4 +1,4 @@
-import { createClient, Entry } from 'contentful'
+import { ContentfulClientApi, createClient, Entry } from 'contentful'
 import type { GetStaticPaths, GetStaticProps, NextPage } from 'next'
 import { ParsedUrlQuery } from 'querystring'
 
@@ -6,12 +6,6 @@ import { PageTemplate } from '../components/page-template'
 import { Page } from '../lib/models/page'
 import { Path } from '../lib/models/path'
 import { Route } from '../lib/models/route'
-
-export const client = createClient({
-  accessToken: process.env.CONTENTFUL_ACCESS_TOKEN ?? '',
-  host: process.env.CONTENTFUL_HOST,
-  space: process.env.CONTENTFUL_SPACE_ID ?? '',
-})
 
 interface PageProps {
   page?: Entry<Page>
@@ -32,7 +26,8 @@ const ContentPage: NextPage<PageProps> = ({ page }) => {
 export default ContentPage
 
 export const getStaticPaths: GetStaticPaths<PageQuery> = async () => {
-  const paths = await getPaths()
+  const client = configureContentfulClient()
+  const paths = await getPaths(client)
 
   return {
     fallback: true,
@@ -40,8 +35,8 @@ export const getStaticPaths: GetStaticPaths<PageQuery> = async () => {
   }
 }
 
-const getPaths = async (): Promise<Path[]> => {
-  const paths = await getRoutePaths()
+const getPaths = async (client: ContentfulClientApi): Promise<Path[]> => {
+  const paths = await getRoutePaths(client)
 
   return paths.map((path) => {
     return {
@@ -52,7 +47,9 @@ const getPaths = async (): Promise<Path[]> => {
   })
 }
 
-const getRoutePaths = async (): Promise<string[]> => {
+const getRoutePaths = async (
+  client: ContentfulClientApi
+): Promise<string[]> => {
   const routes = await client.getEntries<Route>({
     content_type: 'route',
     select: 'fields.path',
@@ -67,13 +64,15 @@ const buildSlug = (path: string): string[] => {
 
 export const getStaticProps: GetStaticProps<PageProps, PageQuery> = async ({
   params,
+  preview,
 }) => {
   if (!params) {
     throw new Error('params must be provided')
   }
 
+  const client = configureContentfulClient(preview)
   const path = buildPath(params.slug)
-  const page = await getPage(path)
+  const page = await getPage(client, path)
 
   return {
     props: {
@@ -82,7 +81,10 @@ export const getStaticProps: GetStaticProps<PageProps, PageQuery> = async ({
   }
 }
 
-const getPage = async (path: string): Promise<Entry<Page>> => {
+const getPage = async (
+  client: ContentfulClientApi,
+  path: string
+): Promise<Entry<Page>> => {
   const resolutionDepth = 10
   const routes = await client.getEntries<Route>({
     content_type: 'route',
@@ -103,4 +105,17 @@ const buildPath = (slug?: string[]): string => {
   }
 
   return ['', ...slug].join('/')
+}
+
+const configureContentfulClient = (preview: boolean = false) => {
+  const accessToken = preview
+    ? process.env.CONTENTFUL_PREVIEW_ACCESS_TOKEN
+    : process.env.CONTENTFUL_ACCESS_TOKEN
+  const host = preview ? process.env.CONTENTFUL_PREVIEW_HOST : undefined
+
+  return createClient({
+    accessToken: accessToken ?? '',
+    host,
+    space: process.env.CONTENTFUL_SPACE_ID ?? '',
+  })
 }
