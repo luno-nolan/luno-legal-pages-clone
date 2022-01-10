@@ -1,5 +1,7 @@
 import { Entry } from 'contentful'
 import React from 'react'
+import ReactMarkdown from 'react-markdown'
+import RemarkGFM from 'remark-gfm'
 
 import { Article } from '../lib/models/article'
 
@@ -12,7 +14,9 @@ export const ArticleTemplate: React.FC<ArticleProps> = ({ article }) => {
   return (
     <article>
       <h1>{fields.title}</h1>
-      <p>{fields.content}</p>
+      <ReactMarkdown remarkPlugins={[RemarkGFM]}>
+        {fields.content}
+      </ReactMarkdown>
     </article>
   )
 }
