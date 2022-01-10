@@ -5,6 +5,7 @@ import { Box, Container } from '@mui/material'
 
 import { Page } from '../lib/models/page'
 import { ArticleTemplate } from './article-template'
+import { Footer } from './footer'
 import { NavigationListTemplate } from './navigation-list-template'
 
 interface PageProps {
@@ -14,7 +15,12 @@ interface PageProps {
 export const PageTemplate: React.FC<PageProps> = ({ page }) => {
   const { fields } = page
   return (
-    <Container maxWidth="md">
+    <Container
+      maxWidth="md"
+      sx={{
+        paddingBottom: '1rem',
+      }}
+    >
       <Box
         component="header"
         sx={{
@@ -43,6 +49,7 @@ export const PageTemplate: React.FC<PageProps> = ({ page }) => {
           ))}
         </aside>
       </Box>
+      <Footer />
     </Container>
   )
 }
