@@ -1,7 +1,9 @@
-import { createClient } from 'contentful'
+import { createClient, Entry } from 'contentful'
 import type { GetStaticPaths, GetStaticProps, NextPage } from 'next'
 import { ParsedUrlQuery } from 'querystring'
 
+import { PageTemplate } from '../components/page-template'
+import { Page } from '../lib/models/page'
 import { Path } from '../lib/models/path'
 import { Route } from '../lib/models/route'
 
@@ -12,7 +14,7 @@ export const client = createClient({
 })
 
 interface PageProps {
-  page?: unknown
+  page?: Entry<Page>
 }
 
 interface PageQuery extends ParsedUrlQuery {
@@ -24,12 +26,7 @@ const ContentPage: NextPage<PageProps> = ({ page }) => {
     return <div>...loading</div>
   }
 
-  return (
-    <>
-      <h1>this is a content page</h1>
-      <pre>{JSON.stringify(page, null, 2)}</pre>
-    </>
-  )
+  return <PageTemplate page={page} />
 }
 
 export default ContentPage
@@ -85,7 +82,7 @@ export const getStaticProps: GetStaticProps<PageProps, PageQuery> = async ({
   }
 }
 
-const getPage = async (path: string): Promise<unknown> => {
+const getPage = async (path: string): Promise<Entry<Page>> => {
   const resolutionDepth = 10
   const routes = await client.getEntries<Route>({
     content_type: 'route',
