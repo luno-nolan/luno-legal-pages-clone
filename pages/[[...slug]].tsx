@@ -9,18 +9,26 @@ import { Route } from '../lib/models/route'
 
 interface PageProps {
   page?: Entry<Page>
+  preview: boolean
 }
 
 interface PageQuery extends ParsedUrlQuery {
   slug?: string[]
 }
 
-const ContentPage: NextPage<PageProps> = ({ page }) => {
+const ContentPage: NextPage<PageProps> = ({ page, preview }) => {
   if (!page) {
     return <div>...loading</div>
   }
 
-  return <PageTemplate page={page} />
+  return (
+    <>
+      {preview && (
+        <h1 style={{ color: 'red' }}>this site is in preview mode</h1>
+      )}
+      <PageTemplate page={page} />
+    </>
+  )
 }
 
 export default ContentPage
@@ -77,6 +85,7 @@ export const getStaticProps: GetStaticProps<PageProps, PageQuery> = async ({
   return {
     props: {
       page,
+      preview: !!preview,
     },
   }
 }
