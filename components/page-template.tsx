@@ -39,9 +39,7 @@ export const PageTemplate: React.FC<PageProps> = ({ page }) => {
         <Box
           component="header"
           sx={{
-            alignItems: 'center',
-            display: 'flex',
-            flexFlow: 'column nowrap',
+            textAlign: 'center',
           }}
         >
           <h1>{fields.heading}</h1>
@@ -59,7 +57,10 @@ export const PageTemplate: React.FC<PageProps> = ({ page }) => {
         <Box
           sx={{
             display: 'flex',
-            flexFlow: 'row nowrap',
+            flexFlow: {
+              xs: 'column nowrap',
+              sm: 'row nowrap',
+            },
           }}
         >
           <main>
