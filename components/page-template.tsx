@@ -1,4 +1,5 @@
 import { Entry } from 'contentful'
+import NextHead from 'next/head'
 import React from 'react'
 
 import { Box, Container } from '@mui/material'
@@ -15,41 +16,47 @@ interface PageProps {
 export const PageTemplate: React.FC<PageProps> = ({ page }) => {
   const { fields } = page
   return (
-    <Container
-      maxWidth="md"
-      sx={{
-        paddingBottom: '1rem',
-      }}
-    >
-      <Box
-        component="header"
+    <>
+      <NextHead>
+        <title>{fields.title}</title>
+        <meta name="description" content={fields.description} />
+      </NextHead>
+      <Container
+        maxWidth="md"
         sx={{
-          alignItems: 'center',
-          display: 'flex',
-          flexFlow: 'column nowrap',
+          paddingBottom: '1rem',
         }}
       >
-        <h1>{fields.title}</h1>
-        <h2>{fields.subtitle}</h2>
-      </Box>
-      <Box
-        sx={{
-          display: 'flex',
-          flexFlow: 'row nowrap',
-        }}
-      >
-        <main>
-          {fields.main.map((article) => (
-            <ArticleTemplate article={article} key={article.sys.id} />
-          ))}
-        </main>
-        <aside>
-          {fields.aside.map((nav) => (
-            <NavigationListTemplate key={nav.sys.id} nav={nav} />
-          ))}
-        </aside>
-      </Box>
-      <Footer />
-    </Container>
+        <Box
+          component="header"
+          sx={{
+            alignItems: 'center',
+            display: 'flex',
+            flexFlow: 'column nowrap',
+          }}
+        >
+          <h1>{fields.heading}</h1>
+          <h2>{fields.subHeading}</h2>
+        </Box>
+        <Box
+          sx={{
+            display: 'flex',
+            flexFlow: 'row nowrap',
+          }}
+        >
+          <main>
+            {fields.main.map((article) => (
+              <ArticleTemplate article={article} key={article.sys.id} />
+            ))}
+          </main>
+          <aside>
+            {fields.aside.map((nav) => (
+              <NavigationListTemplate key={nav.sys.id} nav={nav} />
+            ))}
+          </aside>
+        </Box>
+        <Footer />
+      </Container>
+    </>
   )
 }
