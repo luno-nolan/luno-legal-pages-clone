@@ -13,6 +13,7 @@ export interface Page {
   subHeading: string
 
   // Content
+  lastUpdatedAt: string
   main: Entry<Article>[]
   aside: Entry<NavigationList>[]
 }

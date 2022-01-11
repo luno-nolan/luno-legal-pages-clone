@@ -1,9 +1,11 @@
 import { Entry } from 'contentful'
+import { DateTime } from 'luxon'
 import NextHead from 'next/head'
 import React from 'react'
 
 import { Box, Container } from '@mui/material'
 
+import { useLocale } from '../lib/hooks/use-locale'
 import { Page } from '../lib/models/page'
 import { ArticleTemplate } from './article-template'
 import { Footer } from './footer'
@@ -14,7 +16,14 @@ interface PageProps {
 }
 
 export const PageTemplate: React.FC<PageProps> = ({ page }) => {
-  const { fields } = page
+  const { locale } = useLocale()
+  const { fields, sys } = page
+
+  const lastUpdatedAt = DateTime.fromISO(sys.updatedAt, { locale })
+  const lastUpdatedAtText = `${
+    fields.lastUpdatedAt
+  }: ${lastUpdatedAt.toLocaleString(DateTime.DATE_FULL)}`
+
   return (
     <>
       <NextHead>
@@ -37,6 +46,15 @@ export const PageTemplate: React.FC<PageProps> = ({ page }) => {
         >
           <h1>{fields.heading}</h1>
           <h2>{fields.subHeading}</h2>
+        </Box>
+        <Box
+          component="time"
+          sx={{
+            display: 'block',
+            textAlign: 'center',
+          }}
+        >
+          {lastUpdatedAtText}
         </Box>
         <Box
           sx={{
