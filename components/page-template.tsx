@@ -3,7 +3,7 @@ import { DateTime } from 'luxon'
 import NextHead from 'next/head'
 import React from 'react'
 
-import { Box, Container } from '@mui/material'
+import { Box, Container, Typography } from '@mui/material'
 
 import { useLocale } from '../lib/hooks/use-locale'
 import { Page } from '../lib/models/page'
@@ -30,21 +30,36 @@ export const PageTemplate: React.FC<PageProps> = ({ page }) => {
         <title>{fields.title}</title>
         <meta name="description" content={fields.description} />
       </NextHead>
+      <Box
+        component="header"
+        sx={{
+          backgroundColor: 'lunoblue.main',
+          color: 'lunoblue.contrastText',
+          padding: 2,
+          textAlign: 'center',
+        }}
+      >
+        <Typography
+          component="h1"
+          variant="h4"
+          sx={{ fontSize: '2rem', fontWeight: 800, lineHeight: '2.5rem' }}
+        >
+          {fields.heading}
+        </Typography>
+        <Typography
+          component="h2"
+          variant="h6"
+          sx={{ fontSize: '1.25rem', fontWeight: 800, lineHeight: '2rem' }}
+        >
+          {fields.subHeading}
+        </Typography>
+      </Box>
       <Container
         maxWidth="md"
         sx={{
-          paddingBottom: '1rem',
+          padding: 2,
         }}
       >
-        <Box
-          component="header"
-          sx={{
-            textAlign: 'center',
-          }}
-        >
-          <h1>{fields.heading}</h1>
-          <h2>{fields.subHeading}</h2>
-        </Box>
         <Box
           component="time"
           sx={{
@@ -63,11 +78,19 @@ export const PageTemplate: React.FC<PageProps> = ({ page }) => {
             },
           }}
         >
-          <main>
+          <Box
+            component="main"
+            sx={{
+              margin: {
+                xs: '0 0 1rem 0',
+                sm: '0 1rem 0 0',
+              },
+            }}
+          >
             {fields.main.map((article) => (
               <ArticleTemplate article={article} key={article.sys.id} />
             ))}
-          </main>
+          </Box>
           <aside>
             {fields.aside.map((nav) => (
               <NavigationListTemplate key={nav.sys.id} nav={nav} />
