@@ -4,6 +4,7 @@ import { ParsedUrlQuery } from 'querystring'
 import { useEffect } from 'react'
 
 import { PageTemplate } from '../components/page-template'
+import { RouteNotFound } from '../lib/errors/route-not-found'
 import { useLocale } from '../lib/hooks/use-locale'
 import { Page } from '../lib/models/page'
 import { Path } from '../lib/models/path'
@@ -104,14 +105,24 @@ export const getStaticProps: GetStaticProps<PageProps, PageQuery> = async ({
 
   const client = configureContentfulClient(preview)
   const path = buildPath(params.slug)
-  const page = await getPage(client, path, localeOrDefault)
+  try {
+    const page = await getPage(client, path, localeOrDefault)
 
-  return {
-    props: {
-      locale: localeOrDefault,
-      page,
-      preview: !!preview,
-    },
+    return {
+      props: {
+        locale: localeOrDefault,
+        page,
+        preview: !!preview,
+      },
+    }
+  } catch (error) {
+    if (error instanceof RouteNotFound) {
+      return {
+        notFound: true,
+      }
+    }
+
+    throw error
   }
 }
 
@@ -140,7 +151,7 @@ const getPage = async (
   })
 
   if (!routes.items.length) {
-    throw new Error(`could not find a route entry with path "${path}"`)
+    throw new RouteNotFound(path)
   }
 
   return routes.items[0].fields.page
